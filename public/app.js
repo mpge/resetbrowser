@@ -146,17 +146,6 @@ alert('Browser data cleared! Please refresh the page.');`;
         </div>
 
         <div class="card">
-          <h2>Quick Reset</h2>
-          <p class="subtitle">Clear local data for this site instantly</p>
-          <div class="btn-group">
-            <button class="btn btn-blue" id="quickReset">
-              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-              Clear Local Data
-            </button>
-          </div>
-        </div>
-
-        <div class="card">
           <h2>Console Script</h2>
           <p class="subtitle">Copy and paste into your browser's DevTools console for a deep clean</p>
           <p style="font-size:13px;color:var(--gray-500);margin-bottom:8px;">Open DevTools: <span class="shortcut">F12</span> or <span class="shortcut">Ctrl+Shift+I</span> &rarr; Console tab &rarr; Paste &rarr; Enter</p>
@@ -195,20 +184,6 @@ alert('Browser data cleared! Please refresh the page.');`;
           </div>
         `;
       });
-    });
-
-    // Quick Reset
-    document.getElementById('quickReset').addEventListener('click', () => {
-      // Clear cookies for current domain
-      document.cookie.split(';').forEach(c => {
-        document.cookie = c.trim().split('=')[0] + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
-      });
-      localStorage.clear();
-      sessionStorage.clear();
-      if ('caches' in window) {
-        caches.keys().then(names => names.forEach(n => caches.delete(n)));
-      }
-      showToast('Local data cleared. Please refresh the page.');
     });
 
     // Copy script
