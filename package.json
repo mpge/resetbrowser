@@ -1,0 +1,16 @@
+{
+  "name": "resetbrowser",
+  "version": "1.0.0",
+  "description": "Fix login or loading issues in 30 seconds. Clear cookies & cache for your browser — step-by-step.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["browser", "cache", "cookies", "reset", "clear", "fix", "login"],
+  "author": "MPGE",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}
