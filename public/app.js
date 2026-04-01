@@ -15,8 +15,8 @@
     database: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>',
     hardDrive: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="12" x2="2" y2="12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><line x1="6" y1="16" x2="6.01" y2="16"/><line x1="10" y1="16" x2="10.01" y2="16"/></svg>',
     shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
-    link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',
     zap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+    info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
   };
 
   // --- Browser Detection ---
@@ -29,10 +29,43 @@
     return 'other';
   }
 
-  // --- URL Personalization ---
-  function getAppName() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('app');
+  // --- Brand slug from URL path ---
+  function getBrandSlug() {
+    const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+    if (!path || path === 'index.html') return null;
+    return path;
+  }
+
+  // --- Load brand config ---
+  async function loadBrand(slug) {
+    try {
+      const res = await fetch(`/brands/${slug}.json`);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  }
+
+  // --- Apply brand theme to CSS vars ---
+  function applyBrandTheme(brand) {
+    if (!brand || !brand.color) return;
+    const root = document.documentElement.style;
+    root.setProperty('--accent', brand.color);
+
+    // Derive hover (darken 10%)
+    const hex = brand.color.replace('#', '');
+    const r = Math.max(0, parseInt(hex.slice(0, 2), 16) - 25);
+    const g = Math.max(0, parseInt(hex.slice(2, 4), 16) - 25);
+    const b = Math.max(0, parseInt(hex.slice(4, 6), 16) - 25);
+    root.setProperty('--accent-hover', `rgb(${r},${g},${b})`);
+
+    // Derive light bg
+    const rr = parseInt(hex.slice(0, 2), 16);
+    const gg = parseInt(hex.slice(2, 4), 16);
+    const bb = parseInt(hex.slice(4, 6), 16);
+    root.setProperty('--accent-light', `rgba(${rr},${gg},${bb},0.07)`);
+    root.setProperty('--accent-border', `rgba(${rr},${gg},${bb},0.2)`);
   }
 
   // --- Browser Instructions ---
@@ -93,7 +126,7 @@
     },
   };
 
-  // --- Console Reset Script (raw) ---
+  // --- Console Reset Script ---
   const resetScript = `// Clear all cookies
 document.cookie.split(';').forEach(c => {
   document.cookie = c.trim().split('=')[0] +
@@ -123,15 +156,46 @@ alert('Browser data cleared! Please refresh the page.');`;
   }
 
   // --- Render ---
-  function render() {
+  async function render() {
     const detected = detectBrowser();
-    const appName = getAppName();
+    const brandSlug = getBrandSlug();
+    const brand = brandSlug ? await loadBrand(brandSlug) : null;
+
+    if (brand) {
+      applyBrandTheme(brand);
+      if (brand.name) {
+        document.title = `Reset Browser for ${brand.name}`;
+      }
+    }
+
     const info = instructions[detected];
 
-    // App badge
-    const appBadge = appName
-      ? `<div class="app-badge">Fixing issues for: ${escapeHtml(appName)}</div>`
-      : '';
+    // Header — branded or default
+    let headerContent;
+    if (brand) {
+      const logoImg = brand.logo
+        ? `<img class="brand-logo" src="${escapeHtml(brand.logo)}" alt="${escapeHtml(brand.name)} logo">`
+        : '';
+      headerContent = `
+        <div class="brand-header">
+          ${logoImg}
+          <span class="brand-name">${escapeHtml(brand.name)}</span>
+          <span class="brand-separator"></span>
+          <span class="brand-powered">Powered by <a href="/">ResetBrowser</a></span>
+        </div>
+      `;
+    } else {
+      headerContent = `<a href="/" class="logo">${icons.refresh}Reset<span>Browser</span></a>`;
+    }
+
+    // Brand callout or default subtitle
+    const heroTitle = brand && brand.name
+      ? `Having trouble with <span class="accent">${escapeHtml(brand.name)}</span>?`
+      : 'Fix login or loading issues<br><span class="accent">in 30 seconds</span>';
+
+    const heroDesc = brand && brand.message
+      ? escapeHtml(brand.message)
+      : 'Clear cookies & cache for your browser with step-by-step guidance. Free, open source, no tracking.';
 
     // Browser tabs
     const tabs = Object.entries(instructions)
@@ -145,19 +209,37 @@ alert('Browser data cleared! Please refresh the page.');`;
     // Instructions
     const stepsHtml = info.steps.map(s => `<li>${s}</li>`).join('');
 
+    // Website link for branded pages
+    const brandLink = brand && brand.url
+      ? `<div class="brand-callout animate-in animate-delay-5">
+          ${icons.info}
+          <p>Once you've cleared your browser data, head back to <a href="${escapeHtml(brand.url)}" style="color:var(--accent);font-weight:600;text-decoration:underline;">${escapeHtml(brand.url)}</a> and try again.</p>
+        </div>`
+      : '';
+
+    // Integration tip (default page only)
+    const integrationTip = !brand
+      ? `<div class="integration-tip animate-in animate-delay-5">
+          ${icons.zap}
+          <div class="tip-content">
+            <div class="tip-title">Get your own branded page</div>
+            <div class="tip-text">Submit a PR adding your brand config to <code>/brands/</code> and get a page like <code>resetbrowser.com/yourapp</code>. <a href="https://github.com/mpge/resetbrowser/issues" style="color:var(--accent);text-decoration:underline;">Open an issue</a> or see the README for details.</div>
+          </div>
+        </div>`
+      : '';
+
     document.getElementById('app').innerHTML = `
       <header>
         <div class="container">
-          <a href="/" class="logo">${icons.refresh}Reset<span>Browser</span></a>
+          ${headerContent}
           <a href="https://github.com/mpge/resetbrowser" class="github" target="_blank" rel="noopener">${icons.github}GitHub</a>
         </div>
       </header>
 
       <main class="container">
         <section class="hero animate-in">
-          <h1>Fix login or loading issues<br><span class="accent">in 30 seconds</span></h1>
-          <p>Clear cookies & cache for your browser with step-by-step guidance. Free, open source, no tracking.</p>
-          ${appBadge}
+          <h1>${heroTitle}</h1>
+          <p>${heroDesc}</p>
         </section>
 
         <div class="feature-grid animate-in animate-delay-1">
@@ -203,13 +285,8 @@ alert('Browser data cleared! Please refresh the page.');`;
           </div>
         </div>
 
-        <div class="integration-tip animate-in animate-delay-5">
-          ${icons.zap}
-          <div class="tip-content">
-            <div class="tip-title">Link from your support docs</div>
-            <div class="tip-text">Add <code>?app=YourApp</code> to personalize the page for your users. Example: <code>resetbrowser.com/?app=Acme</code></div>
-          </div>
-        </div>
+        ${brandLink}
+        ${integrationTip}
       </main>
 
       <footer class="animate-in animate-delay-5">
@@ -219,10 +296,10 @@ alert('Browser data cleared! Please refresh the page.');`;
       <div class="toast" id="toast"></div>
     `;
 
-    bindEvents(detected);
+    bindEvents();
   }
 
-  function bindEvents(currentBrowser) {
+  function bindEvents() {
     // Tab switching
     document.querySelectorAll('.browser-tab').forEach(tab => {
       tab.addEventListener('click', () => {
