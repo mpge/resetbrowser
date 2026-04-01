@@ -1,6 +1,24 @@
 (function () {
   'use strict';
 
+  // --- SVG Icons ---
+  const icons = {
+    chrome: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="21.17" y1="8" x2="12" y2="8"/><line x1="3.95" y1="6.06" x2="8.54" y2="14"/><line x1="10.88" y1="21.94" x2="15.46" y2="14"/></svg>',
+    safari: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="16.24" y1="7.76" x2="14.12" y2="14.12"/><line x1="9.88" y1="9.88" x2="7.76" y2="16.24"/><line x1="14.12" y1="9.88" x2="9.88" y2="14.12"/></svg>',
+    firefox: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10"/><path d="M17 8c-1-2-3.5-3-5.5-2.5"/></svg>',
+    edge: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 7.07 17.07"/><path d="M8 12h8"/></svg>',
+    github: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>',
+    refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>',
+    list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>',
+    terminal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>',
+    cookie: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/><path d="M8.5 8.5v.01"/><path d="M16 15.5v.01"/><path d="M12 12v.01"/><path d="M11 17v.01"/><path d="M7 14v.01"/></svg>',
+    database: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>',
+    hardDrive: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="12" x2="2" y2="12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><line x1="6" y1="16" x2="6.01" y2="16"/><line x1="10" y1="16" x2="10.01" y2="16"/></svg>',
+    shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+    link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',
+    zap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+  };
+
   // --- Browser Detection ---
   function detectBrowser() {
     const ua = navigator.userAgent;
@@ -21,7 +39,6 @@
   const instructions = {
     chrome: {
       name: 'Chrome',
-      shortcut: { win: 'Ctrl + Shift + Delete', mac: 'Cmd + Shift + Delete' },
       steps: [
         'Open Chrome and press <span class="shortcut">Ctrl+Shift+Delete</span> (Windows) or <span class="shortcut">Cmd+Shift+Delete</span> (Mac)',
         'Set time range to <strong>"All time"</strong>',
@@ -33,7 +50,6 @@
     },
     safari: {
       name: 'Safari',
-      shortcut: null,
       steps: [
         'Open Safari and click <strong>Safari</strong> in the menu bar',
         'Select <strong>"Settings..."</strong> (or <strong>"Preferences..."</strong>)',
@@ -45,7 +61,6 @@
     },
     firefox: {
       name: 'Firefox',
-      shortcut: { win: 'Ctrl + Shift + Delete', mac: 'Cmd + Shift + Delete' },
       steps: [
         'Open Firefox and press <span class="shortcut">Ctrl+Shift+Delete</span> (Windows) or <span class="shortcut">Cmd+Shift+Delete</span> (Mac)',
         'Set time range to <strong>"Everything"</strong>',
@@ -56,7 +71,6 @@
     },
     edge: {
       name: 'Edge',
-      shortcut: { win: 'Ctrl + Shift + Delete', mac: 'Cmd + Shift + Delete' },
       steps: [
         'Open Edge and press <span class="shortcut">Ctrl+Shift+Delete</span> (Windows) or <span class="shortcut">Cmd+Shift+Delete</span> (Mac)',
         'Set time range to <strong>"All time"</strong>',
@@ -68,7 +82,6 @@
     },
     other: {
       name: 'Your Browser',
-      shortcut: null,
       steps: [
         'Open your browser\'s <strong>Settings</strong> or <strong>Preferences</strong>',
         'Find the <strong>Privacy</strong> or <strong>Security</strong> section',
@@ -80,7 +93,7 @@
     },
   };
 
-  // --- Console Reset Script ---
+  // --- Console Reset Script (raw) ---
   const resetScript = `// Clear all cookies
 document.cookie.split(';').forEach(c => {
   document.cookie = c.trim().split('=')[0] +
@@ -99,6 +112,16 @@ if ('caches' in window) {
 console.log('All cookies, storage, and caches cleared.');
 alert('Browser data cleared! Please refresh the page.');`;
 
+  // --- Syntax Highlighting ---
+  function highlightCode(code) {
+    return escapeHtml(code)
+      .replace(/(\/\/[^\n]*)/g, '<span class="token-comment">$1</span>')
+      .replace(/('(?:[^'\\]|\\.)*')/g, '<span class="token-string">$1</span>')
+      .replace(/\b(const|let|var|if|in|function|return|forEach|then)\b/g, '<span class="token-keyword">$1</span>')
+      .replace(/\b(document|window|localStorage|sessionStorage|console|caches)\b/g, '<span class="token-property">$1</span>')
+      .replace(/\.(cookie|split|trim|keys|forEach|delete|clear|log)\b/g, '.<span class="token-method">$1</span>');
+  }
+
   // --- Render ---
   function render() {
     const detected = detectBrowser();
@@ -113,9 +136,11 @@ alert('Browser data cleared! Please refresh the page.');`;
     // Browser tabs
     const tabs = Object.entries(instructions)
       .filter(([k]) => k !== 'other')
-      .map(([key, val]) =>
-        `<button class="browser-tab ${key === detected ? 'active' : ''}" data-browser="${key}">${val.name}</button>`
-      ).join('');
+      .map(([key, val]) => {
+        const isDetected = key === detected;
+        const badge = isDetected ? '<span class="detected-badge">You</span>' : '';
+        return `<button class="browser-tab ${isDetected ? 'active' : ''}" data-browser="${key}">${icons[key]}${val.name}${badge}</button>`;
+      }).join('');
 
     // Instructions
     const stepsHtml = info.steps.map(s => `<li>${s}</li>`).join('');
@@ -123,40 +148,71 @@ alert('Browser data cleared! Please refresh the page.');`;
     document.getElementById('app').innerHTML = `
       <header>
         <div class="container">
-          <a href="/" class="logo">Reset<span>Browser</span></a>
-          <a href="https://github.com/mpge/resetbrowser" class="github" target="_blank" rel="noopener">GitHub</a>
+          <a href="/" class="logo">${icons.refresh}Reset<span>Browser</span></a>
+          <a href="https://github.com/mpge/resetbrowser" class="github" target="_blank" rel="noopener">${icons.github}GitHub</a>
         </div>
       </header>
 
       <main class="container">
-        <section class="hero">
-          <h1>Fix login or loading issues<br>in 30 seconds</h1>
-          <p>Clear cookies & cache for your browser — step-by-step</p>
+        <section class="hero animate-in">
+          <h1>Fix login or loading issues<br><span class="accent">in 30 seconds</span></h1>
+          <p>Clear cookies & cache for your browser with step-by-step guidance. Free, open source, no tracking.</p>
           ${appBadge}
         </section>
 
-        <div class="browser-tabs">${tabs}</div>
+        <div class="feature-grid animate-in animate-delay-1">
+          <div class="feature-item">
+            <div class="feature-icon">${icons.cookie}</div>
+            <span class="feature-label">Cookies</span>
+            <span class="feature-desc">Session & auth tokens</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">${icons.hardDrive}</div>
+            <span class="feature-label">Cache</span>
+            <span class="feature-desc">Images & static files</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">${icons.database}</div>
+            <span class="feature-label">Storage</span>
+            <span class="feature-desc">Local & session data</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">${icons.shield}</div>
+            <span class="feature-label">Workers</span>
+            <span class="feature-desc">Service worker caches</span>
+          </div>
+        </div>
 
-        <div id="instructions">
+        <div class="browser-tabs animate-in animate-delay-2">${tabs}</div>
+
+        <div id="instructions" class="animate-in animate-delay-3">
           <div class="card">
-            <h2>Clear ${info.name} Data</h2>
+            <div class="card-header">${icons.list}<h2>Clear ${info.name} Data</h2></div>
             <p class="subtitle">Follow these steps to fix login, loading, or display issues</p>
             <ol class="steps">${stepsHtml}</ol>
           </div>
         </div>
 
-        <div class="card">
-          <h2>Console Script</h2>
+        <div class="card animate-in animate-delay-4">
+          <div class="card-header">${icons.terminal}<h2>Console Script</h2></div>
           <p class="subtitle">Copy and paste into your browser's DevTools console for a deep clean</p>
-          <p style="font-size:13px;color:var(--gray-500);margin-bottom:8px;">Open DevTools: <span class="shortcut">F12</span> or <span class="shortcut">Ctrl+Shift+I</span> &rarr; Console tab &rarr; Paste &rarr; Enter</p>
+          <p style="font-size:13px;color:var(--text-2);margin-bottom:8px;">Open DevTools: <span class="shortcut">F12</span> or <span class="shortcut">Ctrl+Shift+I</span> &rarr; Console tab &rarr; Paste &rarr; Enter</p>
           <div class="code-block">
             <button class="copy-btn" id="copyScript">Copy</button>
-            <pre id="scriptCode">${escapeHtml(resetScript)}</pre>
+            <pre id="scriptCode">${highlightCode(resetScript)}</pre>
+          </div>
+        </div>
+
+        <div class="integration-tip animate-in animate-delay-5">
+          ${icons.zap}
+          <div class="tip-content">
+            <div class="tip-title">Link from your support docs</div>
+            <div class="tip-text">Add <code>?app=YourApp</code> to personalize the page for your users. Example: <code>resetbrowser.com/?app=Acme</code></div>
           </div>
         </div>
       </main>
 
-      <footer>
+      <footer class="animate-in animate-delay-5">
         <p>Open source &middot; <a href="https://github.com/mpge/resetbrowser">GitHub</a> &middot; No tracking &middot; No data collected</p>
       </footer>
 
@@ -178,7 +234,7 @@ alert('Browser data cleared! Please refresh the page.');`;
         const stepsHtml = info.steps.map(s => `<li>${s}</li>`).join('');
         document.getElementById('instructions').innerHTML = `
           <div class="card">
-            <h2>Clear ${info.name} Data</h2>
+            <div class="card-header">${icons.list}<h2>Clear ${info.name} Data</h2></div>
             <p class="subtitle">Follow these steps to fix login, loading, or display issues</p>
             <ol class="steps">${stepsHtml}</ol>
           </div>
