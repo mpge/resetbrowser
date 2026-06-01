@@ -49,7 +49,7 @@
 
   // --- Apply brand theme to CSS vars ---
   function applyBrandTheme(brand) {
-    if (!brand || !brand.color) return;
+    if (!brand || !brand.color || !isHexColor(brand.color)) return;
     const root = document.documentElement.style;
     root.setProperty('--accent', brand.color);
 
@@ -66,6 +66,25 @@
     const bb = parseInt(hex.slice(4, 6), 16);
     root.setProperty('--accent-light', `rgba(${rr},${gg},${bb},0.07)`);
     root.setProperty('--accent-border', `rgba(${rr},${gg},${bb},0.2)`);
+  }
+
+  function isHexColor(value) {
+    return typeof value === 'string' && /^#[0-9a-fA-F]{6}$/.test(value);
+  }
+
+  function safeExternalUrl(value) {
+    try {
+      const url = new URL(value);
+      return ['https:', 'http:'].includes(url.protocol) ? url.href : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function safeImageUrl(value) {
+    if (typeof value !== 'string') return null;
+    if (value.startsWith('/') && !value.startsWith('//')) return value;
+    return safeExternalUrl(value);
   }
 
   // --- Browser Instructions ---
@@ -173,8 +192,9 @@ alert('Browser data cleared! Please refresh the page.');`;
     // Header — branded or default
     let headerContent;
     if (brand) {
-      const logoImg = brand.logo
-        ? `<img class="brand-logo" src="${escapeHtml(brand.logo)}" alt="${escapeHtml(brand.name)} logo">`
+      const logoUrl = brand.logo ? safeImageUrl(brand.logo) : null;
+      const logoImg = logoUrl
+        ? `<img class="brand-logo" src="${escapeHtml(logoUrl)}" alt="${escapeHtml(brand.name)} logo">`
         : '';
       headerContent = `
         <div class="brand-header">
@@ -210,10 +230,11 @@ alert('Browser data cleared! Please refresh the page.');`;
     const stepsHtml = info.steps.map(s => `<li>${s}</li>`).join('');
 
     // Website link for branded pages
-    const brandLink = brand && brand.url
+    const brandUrl = brand?.url ? safeExternalUrl(brand.url) : null;
+    const brandLink = brand && brandUrl
       ? `<div class="brand-callout animate-in animate-delay-5">
           ${icons.info}
-          <p>Once you've cleared your browser data, head back to <a href="${escapeHtml(brand.url)}" style="color:var(--accent);font-weight:600;text-decoration:underline;">${escapeHtml(brand.url)}</a> and try again.</p>
+          <p>Once you've cleared your browser data, head back to <a href="${escapeHtml(brandUrl)}" style="color:var(--accent);font-weight:600;text-decoration:underline;">${escapeHtml(brandUrl)}</a> and try again.</p>
         </div>`
       : '';
 

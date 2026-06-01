@@ -81,3 +81,14 @@ test('does not load third-party font hosts from the app shell', () => {
   assert.doesNotMatch(html, /fonts\.googleapis\.com/);
   assert.doesNotMatch(html, /fonts\.gstatic\.com/);
 });
+
+test('sanitizes brand-provided urls before rendering them into html', () => {
+  const js = fs.readFileSync(path.join(__dirname, '..', 'public', 'app.js'), 'utf8');
+
+  assert.match(js, /function safeExternalUrl/);
+  assert.match(js, /function safeImageUrl/);
+  assert.match(js, /const brandUrl = brand\?\.url \? safeExternalUrl\(brand\.url\) : null;/);
+  assert.match(js, /const logoUrl = brand\.logo \? safeImageUrl\(brand\.logo\) : null;/);
+  assert.doesNotMatch(js, /href="\$\{escapeHtml\(brand\.url\)\}"/);
+  assert.doesNotMatch(js, /src="\$\{escapeHtml\(brand\.logo\)\}"/);
+});
