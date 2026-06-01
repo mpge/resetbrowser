@@ -48,3 +48,24 @@ test('only sends hsts for secure proxy requests', async () => {
   const secure = await request('/', { 'x-forwarded-proto': 'https' });
   assert.equal(secure.headers['strict-transport-security'], 'max-age=31536000; includeSubDomains');
 });
+
+test('does not serve the app shell for missing static assets', async () => {
+  const res = await request('/missing-app.js');
+
+  assert.equal(res.statusCode, 404);
+  assert.match(res.headers['content-type'], /^text\/plain/);
+});
+
+test('does not serve the app shell for missing brand configs', async () => {
+  const res = await request('/brands/missing.json');
+
+  assert.equal(res.statusCode, 404);
+  assert.match(res.headers['content-type'], /^text\/plain/);
+});
+
+test('keeps extensionless routes on the app shell fallback', async () => {
+  const res = await request('/stallion');
+
+  assert.equal(res.statusCode, 200);
+  assert.match(res.headers['content-type'], /^text\/html/);
+});

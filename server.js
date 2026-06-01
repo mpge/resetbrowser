@@ -39,6 +39,16 @@ app.use((req, res, next) => {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+function sendNotFoundForAsset(req, res, next) {
+  if (path.extname(req.path)) {
+    return res.status(404).type('text/plain').send('Not found');
+  }
+
+  next();
+}
+
+app.use(sendNotFoundForAsset);
+
 // Brand routes — serve index.html for any valid brand slug
 app.get('/:slug', (req, res) => {
   const slug = req.params.slug.toLowerCase().replace(/[^a-z0-9-]/g, '');
