@@ -1,5 +1,7 @@
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
 const http = require('node:http');
+const path = require('node:path');
 const { test } = require('node:test');
 
 const app = require('../server');
@@ -39,6 +41,9 @@ test('serves baseline browser security headers', async () => {
   assert.match(res.headers['content-security-policy'], /default-src 'self'/);
   assert.match(res.headers['content-security-policy'], /script-src 'self'/);
   assert.match(res.headers['content-security-policy'], /object-src 'none'/);
+  assert.match(res.headers['content-security-policy'], /style-src 'self' 'unsafe-inline'/);
+  assert.match(res.headers['content-security-policy'], /font-src 'self'/);
+  assert.doesNotMatch(res.headers['content-security-policy'], /fonts\.(?:googleapis|gstatic)\.com/);
 });
 
 test('only sends hsts for secure proxy requests', async () => {
@@ -68,4 +73,11 @@ test('keeps extensionless routes on the app shell fallback', async () => {
 
   assert.equal(res.statusCode, 200);
   assert.match(res.headers['content-type'], /^text\/html/);
+});
+
+test('does not load third-party font hosts from the app shell', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', 'public', 'index.html'), 'utf8');
+
+  assert.doesNotMatch(html, /fonts\.googleapis\.com/);
+  assert.doesNotMatch(html, /fonts\.gstatic\.com/);
 });
